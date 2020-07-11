@@ -1,0 +1,25 @@
+language: python
+
+services:
+  - docker
+
+notifications:
+  email:
+    recipients:
+      - akukulanski@gmail.com
+    on_success: never # default: change
+    on_failure: always # default: always
+
+git:
+  depth: 1
+
+
+before_install:
+- docker pull akukulanski/hdl-tools:latest || true
+
+script:
+- docker build --cache-from akukulanski/hdl-tools:latest --tag akukulanski/hdl-tools:stable -f ./dockerfile .
+- docker run -w /home -v $(pwd):/home akukulanski/hdl-tools:stable python3 -m pytest -vs test/
+
+after_success:
+- docker push akukulanski/hdl-tools:stable
